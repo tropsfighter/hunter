@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hunter"
+version = "0.1.0"
+description = "KOL discovery backend (YouTube + API)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "google-api-python-client>=2.100",
+  "pydantic>=2",
+  "pydantic-settings>=2",
+  "pyyaml>=6",
+  "typer>=0.12",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+hunter = "hunter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hunter*"]

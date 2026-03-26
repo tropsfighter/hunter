@@ -1,0 +1,20 @@
+# YouTube search queries per topic (used by discovery + scoring tokens)
+football_equipment:
+  - football boots review
+  - soccer cleats review
+  - shin guards football
+  - goalkeeper gloves review
+  - football training equipment review
+  - soccer ball review
+  - football goal training equipment
+  - football kit review
+
+smart_wearables:
+  - GPS vest football training
+  - soccer player tracker wearable
+  - smartwatch football training
+  - heart rate strap football
+  - catapult GPS tracker soccer
+  - whoop strap athlete review
+  - garmin soccer training watch
+  - football wearable technology
