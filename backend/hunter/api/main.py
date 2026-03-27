@@ -76,10 +76,15 @@ def list_kols(
         description="score | subscribers | title | contact",
     ),
     limit: int = Query(default=100, ge=1, le=500),
+    search: str | None = Query(
+        default=None,
+        max_length=200,
+        description="Filter by text in channel fields or videos for this topic row",
+    ),
 ) -> list[KolOut]:
     if sort not in ("score", "subscribers", "title", "contact"):
         sort = "score"
-    return storeq.list_kols(conn, topic=topic, sort=sort, limit=limit)
+    return storeq.list_kols(conn, topic=topic, sort=sort, limit=limit, search=search)
 
 
 @app.get("/api/kols/export.csv")
@@ -88,8 +93,9 @@ def export_kols_csv(
     topic: str | None = Query(default=None),
     sort: str = Query(default="score"),
     limit: int = Query(default=500, ge=1, le=2000),
+    search: str | None = Query(default=None, max_length=200),
 ) -> Response:
-    rows = storeq.list_kols(conn, topic=topic, sort=sort, limit=limit)
+    rows = storeq.list_kols(conn, topic=topic, sort=sort, limit=limit, search=search)
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(

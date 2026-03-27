@@ -4,6 +4,13 @@ from hunter.models.kol import KolOut
 from hunter.utils.contact import extract_contact_detail
 
 
+def _sql_like_pattern(substring: str) -> str:
+    """LIKE pattern for case-insensitive match; % and _ in user input are literal (ESCAPE '\\')."""
+    s = substring.strip().lower()
+    s = s.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{s}%"
+
+
 def upsert_channel(
     conn: sqlite3.Connection,
     *,
@@ -157,6 +164,7 @@ def list_kols(
     topic: str | None,
     sort: str,
     limit: int,
+    search: str | None = None,
 ) -> list[KolOut]:
     if sort == "subscribers":
         order_clause = "c.subscriber_count DESC, ct.score DESC"
@@ -169,11 +177,34 @@ def list_kols(
 
     sort_contact = sort == "contact"
 
+    conditions: list[str] = []
     params: list = []
-    topic_clause = ""
     if topic is not None and topic != "" and topic != "all":
-        topic_clause = "WHERE ct.topic = ?"
+        conditions.append("ct.topic = ?")
         params.append(topic)
+
+    q = (search or "").strip()
+    if q:
+        pat = _sql_like_pattern(q)
+        conditions.append(
+            """(
+            LOWER(c.title) LIKE ? ESCAPE '\\'
+            OR LOWER(COALESCE(c.description, '')) LIKE ? ESCAPE '\\'
+            OR LOWER(COALESCE(c.custom_url, '')) LIKE ? ESCAPE '\\'
+            OR LOWER(c.channel_id) LIKE ? ESCAPE '\\'
+            OR EXISTS (
+                SELECT 1 FROM videos v
+                WHERE v.channel_id = c.channel_id AND v.topic = ct.topic
+                AND (
+                    LOWER(v.title) LIKE ? ESCAPE '\\'
+                    OR LOWER(COALESCE(v.description, '')) LIKE ? ESCAPE '\\'
+                )
+            )
+        )"""
+        )
+        params.extend([pat] * 6)
+
+    where_clause = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
     sql = f"""
         SELECT
@@ -188,7 +219,7 @@ def list_kols(
             ct.score
         FROM channel_topics ct
         JOIN channels c ON c.channel_id = ct.channel_id
-        {topic_clause}
+        {where_clause}
         ORDER BY {order_clause}
     """
     if not sort_contact:

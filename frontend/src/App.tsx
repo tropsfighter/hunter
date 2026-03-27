@@ -139,6 +139,7 @@ function apiHealthBadge(health: string): { className: string; label: string; tit
 export default function App() {
   const [health, setHealth] = useState<string>("…");
   const [topic, setTopic] = useState<string>("all");
+  const [searchText, setSearchText] = useState<string>("");
   const [sort, setSort] = useState<string>("score");
   const [kols, setKols] = useState<Kol[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -167,8 +168,10 @@ export default function App() {
     p.set("sort", sort);
     p.set("limit", "200");
     if (topic !== "all") p.set("topic", topic);
+    const q = searchText.trim();
+    if (q) p.set("search", q);
     return p.toString();
-  }, [topic, sort]);
+  }, [topic, sort, searchText]);
 
   const load = useCallback(async () => {
     setError(null);
@@ -226,6 +229,17 @@ export default function App() {
             <option value="football_equipment">Football equipment</option>
             <option value="smart_wearables">Smart wearables</option>
           </select>
+        </label>
+        <label className="field field--search">
+          <span>Search</span>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Channel or video text…"
+            maxLength={200}
+            autoComplete="off"
+          />
         </label>
         <label className="field">
           <span>Sort by</span>

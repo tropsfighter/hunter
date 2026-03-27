@@ -161,6 +161,43 @@
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
+.field input[type="text"] {
+  text-transform: none;
+  letter-spacing: normal;
+  min-width: 12rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field input[type="text"]::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.field input[type="text"]:hover {
+  border-color: var(--border-strong);
+}
+
+.field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.field--search {
+  flex: 1 1 14rem;
+  max-width: 22rem;
+}
+
 .field--range {
   min-width: 11rem;
   flex: 1 1 14rem;
