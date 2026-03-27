@@ -117,6 +117,40 @@ def finish_discovery_run(
     )
 
 
+def _kol_out_from_row(conn: sqlite3.Connection, r: sqlite3.Row) -> KolOut:
+    cid = r["channel_id"]
+    custom = r["custom_url"]
+    url = (
+        f"https://www.youtube.com/@{custom.lstrip('@')}"
+        if custom
+        else f"https://www.youtube.com/channel/{cid}"
+    )
+    desc = r["description"] or ""
+    topic_row = str(r["topic"])
+    video_text = video_descriptions_blob_for_contact(conn, cid, topic_row)
+    contact = extract_contact_detail(desc, extra_text=video_text)
+    return KolOut(
+        channel_id=cid,
+        title=r["title"] or "",
+        description=desc,
+        custom_url=custom,
+        subscriber_count=r["subscriber_count"],
+        video_count=r["video_count"],
+        thumbnail_url=r["thumbnail_url"],
+        topic=r["topic"],
+        score=float(r["score"] or 0),
+        youtube_url=url,
+        contact_detail=contact,
+    )
+
+
+def _contact_sort_key(contact_detail: str) -> tuple[int, str]:
+    t = (contact_detail or "").strip()
+    if not t:
+        return (1, "")
+    return (0, t.casefold())
+
+
 def list_kols(
     conn: sqlite3.Connection,
     *,
@@ -128,8 +162,12 @@ def list_kols(
         order_clause = "c.subscriber_count DESC, ct.score DESC"
     elif sort == "title":
         order_clause = "c.title COLLATE NOCASE ASC"
+    elif sort == "contact":
+        order_clause = "c.channel_id ASC"
     else:
         order_clause = "ct.score DESC, c.subscriber_count DESC"
+
+    sort_contact = sort == "contact"
 
     params: list = []
     topic_clause = ""
@@ -152,39 +190,16 @@ def list_kols(
         JOIN channels c ON c.channel_id = ct.channel_id
         {topic_clause}
         ORDER BY {order_clause}
-        LIMIT ?
     """
-    params.append(limit)
+    if not sort_contact:
+        sql += " LIMIT ?"
+        params.append(limit)
 
     rows = conn.execute(sql, params).fetchall()
-    out: list[KolOut] = []
-    for r in rows:
-        cid = r["channel_id"]
-        custom = r["custom_url"]
-        url = (
-            f"https://www.youtube.com/@{custom.lstrip('@')}"
-            if custom
-            else f"https://www.youtube.com/channel/{cid}"
-        )
-        desc = r["description"] or ""
-        topic_row = str(r["topic"])
-        video_text = video_descriptions_blob_for_contact(conn, cid, topic_row)
-        contact = extract_contact_detail(desc, extra_text=video_text)
-        out.append(
-            KolOut(
-                channel_id=cid,
-                title=r["title"] or "",
-                description=desc,
-                custom_url=custom,
-                subscriber_count=r["subscriber_count"],
-                video_count=r["video_count"],
-                thumbnail_url=r["thumbnail_url"],
-                topic=r["topic"],
-                score=float(r["score"] or 0),
-                youtube_url=url,
-                contact_detail=contact,
-            )
-        )
+    out = [_kol_out_from_row(conn, r) for r in rows]
+    if sort_contact:
+        out.sort(key=lambda k: _contact_sort_key(k.contact_detail))
+        out = out[:limit]
     return out
 
 
@@ -205,7 +220,7 @@ def video_descriptions_blob_for_contact(
     channel_id: str,
     topic: str,
     *,
-    limit: int = 8,
+    limit: int = 16,
 ) -> str:
     """Longer video descriptions often contain business email / link-in-bio (public)."""
     rows = conn.execute(

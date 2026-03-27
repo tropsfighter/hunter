@@ -14,5 +14,5 @@ class KolOut(BaseModel):
     youtube_url: str
     contact_detail: str = Field(
         default="",
-        description="Public email(s) from channel/video text only; empty if none",
+        description="Emails + contact URLs from public channel/video text; empty if none",
     )

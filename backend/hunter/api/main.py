@@ -73,11 +73,11 @@ def list_kols(
     ),
     sort: str = Query(
         default="score",
-        description="score | subscribers | title",
+        description="score | subscribers | title | contact",
     ),
     limit: int = Query(default=100, ge=1, le=500),
 ) -> list[KolOut]:
-    if sort not in ("score", "subscribers", "title"):
+    if sort not in ("score", "subscribers", "title", "contact"):
         sort = "score"
     return storeq.list_kols(conn, topic=topic, sort=sort, limit=limit)
 

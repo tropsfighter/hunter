@@ -71,7 +71,7 @@ function ContactPart({ part }: { part: string }) {
   return <span className="contact-text">{p}</span>;
 }
 
-/** contact_detail from API: email address(es) only, joined with " · "; empty → em dash. */
+/** contact_detail from API: emails and/or URLs, joined with " · "; empty → em dash. */
 function ContactCell({ value }: { value: string }) {
   const v = value?.trim() ?? "";
   if (!v) return <span className="contact-muted">—</span>;
@@ -233,6 +233,7 @@ export default function App() {
             <option value="score">Score</option>
             <option value="subscribers">Subscribers</option>
             <option value="title">Channel name</option>
+            <option value="contact">Contact (email)</option>
           </select>
         </label>
         <label className="field field--range">
