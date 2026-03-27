@@ -48,6 +48,8 @@
 body {
   margin: 0;
   min-height: 100vh;
+  /* Shared with fixed table scroll dock (App.css) */
+  --app-pad-x: clamp(1rem, 4vw, 2rem);
 }
 
 #root {

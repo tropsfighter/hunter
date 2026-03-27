@@ -12,7 +12,7 @@ def discover(
     topic: str = typer.Option(
         ...,
         "--topic",
-        help="Topic key from keywords.yaml (e.g. football_equipment, smart_wearables).",
+        help="Topic key from the database (seeded from keywords.yaml); e.g. football_equipment.",
     ),
     max_queries: int | None = typer.Option(
         None,

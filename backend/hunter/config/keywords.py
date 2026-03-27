@@ -1,3 +1,9 @@
+"""Default YouTube search queries per topic (YAML).
+
+At runtime, topics are stored in SQLite (`topic_queries`) and seeded from this file when
+the table is empty. Use the API or `hunter.storage.topics` for programmatic access.
+"""
+
 from functools import lru_cache
 from pathlib import Path
 
