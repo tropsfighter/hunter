@@ -82,3 +82,18 @@ Open http://localhost:5173 with the API on port **8000** (Vite proxies `/api` an
 cd backend
 .\.venv\Scripts\ruff.exe check hunter
 ```
+
+### API automated tests (pytest)
+
+From `backend/` with the dev venv active:
+
+```powershell
+pip install -e ".[dev]"
+python run_tests_and_report.py
+```
+
+This runs all tests under `backend/tests/`, prints results, and writes a **timestamped Markdown report** to `backend/reports/api_test_report_YYYYMMDD_HHMMSS.md` (summary + per-case results + **interface coverage** table). To run tests without generating the report:
+
+```powershell
+pytest tests -v
+```
