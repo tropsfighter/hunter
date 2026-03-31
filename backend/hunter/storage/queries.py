@@ -124,6 +124,19 @@ def finish_discovery_run(
     )
 
 
+def list_discovery_runs(conn: sqlite3.Connection, *, limit: int = 30) -> list[sqlite3.Row]:
+    return conn.execute(
+        """
+        SELECT id, topic, started_at, finished_at, queries_run,
+               videos_upserted, channels_upserted
+        FROM discovery_runs
+        ORDER BY id DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+
+
 def _kol_out_from_row(conn: sqlite3.Connection, r: sqlite3.Row) -> KolOut:
     cid = r["channel_id"]
     custom = r["custom_url"]

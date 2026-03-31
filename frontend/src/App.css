@@ -1,9 +1,14 @@
 .app {
   max-width: 72rem;
   margin: 0 auto;
-  padding: 1.75rem clamp(1rem, 4vw, 2rem) 4rem;
+  padding: 1.75rem var(--app-pad-x, clamp(1rem, 4vw, 2rem)) 4rem;
   /* Overridden inline for adjustable Contact column */
   --contact-col: 320px;
+}
+
+/* Room for fixed horizontal scrollbar dock (see .table-hscroll-dock) */
+.app.app--table-hscroll-dock {
+  padding-bottom: calc(4rem + 2.5rem);
 }
 
 /* —— Header —— */
@@ -229,6 +234,13 @@
   text-align: right;
 }
 
+.toolbar-topic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
 .toolbar-actions {
   display: flex;
   flex-wrap: wrap;
@@ -257,6 +269,12 @@
   transform: scale(0.98);
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-primary {
   background: var(--accent);
   color: #fff;
@@ -279,6 +297,25 @@
   border-color: var(--border-strong);
 }
 
+.btn--sm {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.results-bar {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+
+.results-bar__count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  margin-right: 0.2rem;
+}
+
 .err {
   margin: 0 0 1rem;
   padding: 0.75rem 1rem;
@@ -290,13 +327,279 @@
   border: 1px solid rgba(196, 30, 58, 0.15);
 }
 
+.banner {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  border: 1px solid var(--border);
+}
+
+.banner--info {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border-color: rgba(27, 107, 92, 0.2);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  background: rgba(20, 24, 32, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: min(32rem, 100%);
+  margin-top: 2vh;
+  padding: 1.25rem 1.35rem 1.35rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal__close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--ink-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal__close:hover {
+  background: var(--border);
+  color: var(--ink);
+}
+
+.modal__hint {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.modal__hint code {
+  font-size: 0.78rem;
+  background: var(--bg-subtle);
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+}
+
+.modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.modal__field input[type="text"],
+.modal__textarea {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.modal__textarea {
+  resize: vertical;
+  min-height: 10rem;
+  line-height: 1.45;
+}
+
+.modal__field input:focus,
+.modal__textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.modal__err {
+  margin-bottom: 0.75rem;
+}
+
+.modal__existing {
+  margin-bottom: 1rem;
+}
+
+.modal__existing-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  margin-bottom: 0.4rem;
+}
+
+.modal__topic-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.chip-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
 /* —— Table —— */
-.table-wrap {
-  overflow-x: auto;
+.table-panel {
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* Horizontal scroll happens here; scrollbar is hidden — use fixed dock below */
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.table-wrap::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+/* Single visible horizontal scrollbar, pinned to viewport while this page is open */
+.table-hscroll-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 0.35rem 0 calc(0.45rem + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.1);
+}
+
+/* Same horizontal band as .app so the bar lines up with the white table card (not a shorter 72rem strip) */
+.table-hscroll-dock__align {
+  width: min(72rem, 100vw);
+  max-width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding-inline: var(--app-pad-x, clamp(1rem, 4vw, 2rem));
+  padding-right: max(
+    env(safe-area-inset-right, 0px),
+    calc(var(--app-pad-x, clamp(1rem, 4vw, 2rem)) - 4px)
+  );
+}
+
+.table-hscroll-dock__track {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(27, 107, 92, 0.45) var(--bg-subtle);
+}
+
+.table-hscroll-dock__track:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+  border-radius: var(--radius-sm);
+}
+
+.table-hscroll-dock__track::-webkit-scrollbar {
+  height: 12px;
+}
+
+.table-hscroll-dock__track::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+  border-radius: 999px;
+}
+
+.table-hscroll-dock__track::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(27, 107, 92, 0.55), rgba(27, 107, 92, 0.38));
+  border-radius: 999px;
+  border: 2px solid var(--bg-subtle);
+}
+
+.table-hscroll-dock__track::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(27, 107, 92, 0.7), rgba(27, 107, 92, 0.52));
+}
+
+.table-hscroll-dock__sizer {
+  pointer-events: none;
 }
 
 table.kols {

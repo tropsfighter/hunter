@@ -60,8 +60,17 @@ def init_db(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_videos_channel ON videos(channel_id);
         CREATE INDEX IF NOT EXISTS idx_videos_topic ON videos(topic);
         CREATE INDEX IF NOT EXISTS idx_channel_topics_topic ON channel_topics(topic);
+
+        CREATE TABLE IF NOT EXISTS topic_queries (
+            topic TEXT PRIMARY KEY,
+            queries_json TEXT NOT NULL,
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
         """
     )
+    from hunter.storage import topics as topic_store
+
+    topic_store.seed_from_yaml_if_empty(conn)
     conn.commit()
 
 

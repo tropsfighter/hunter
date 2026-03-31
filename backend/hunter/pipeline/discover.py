@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import time
-from pathlib import Path
 
 from hunter.clients.youtube import (
     build_youtube_service,
@@ -12,11 +11,11 @@ from hunter.clients.youtube import (
     parse_video_row,
     search_video_ids,
 )
-from hunter.config.keywords import all_scoring_tokens, queries_for_topic, topic_keys
 from hunter.config.settings import Settings, get_settings
 from hunter.scoring.rank import score_channel
 from hunter.storage.db import db_session
 from hunter.storage import queries as storeq
+from hunter.storage import topics as topic_store
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +34,14 @@ def run_discovery(
             "Missing YOUTUBE_API_KEY. Copy backend/.env.example to backend/.env and set the key.",
         )
 
-    if topic not in topic_keys():
-        raise ValueError(f"Unknown topic {topic!r}. Valid: {', '.join(topic_keys())}")
+    db_path = settings.hunter_db_path
+    with db_session(db_path) as conn:
+        queries_full = topic_store.get_queries(conn, topic)
+        valid = topic_store.list_topic_keys(conn)
+    if not queries_full:
+        raise ValueError(f"Unknown topic {topic!r}. Valid: {', '.join(valid)}")
 
-    queries = queries_for_topic(topic)
+    queries = queries_full
     nq = max_queries if max_queries is not None else min(6, len(queries))
     queries = queries[:nq]
 
@@ -90,7 +93,6 @@ def run_discovery(
     videos_upserted = 0
     channels_upserted = 0
 
-    db_path: Path = settings.hunter_db_path
     with db_session(db_path) as conn:
         run_id = storeq.start_discovery_run(conn, topic)
         try:
@@ -130,7 +132,7 @@ def run_discovery(
                 )
                 videos_upserted += 1
 
-            topic_tokens = all_scoring_tokens(topic)
+            topic_tokens = topic_store.scoring_tokens_for_topic(conn, topic)
             for cid in channel_unique:
                 if cid in channel_items:
                     crow = parse_channel_row(channel_items[cid])
